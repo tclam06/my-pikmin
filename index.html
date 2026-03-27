@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Pikmin皮克敏圖鑑 Ultimate</title>
+    <style>
+        :root {
+            --ios-blur: blur(20px); 
+            --ios-border: 1px solid rgba(255, 255, 255, 0.3);
+            --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+            
+            /* 高透明度色彩 */
+            --glass-red: rgba(255, 59, 48, 0.45);
+            --glass-yellow: rgba(255, 204, 0, 0.5);
+            --glass-blue: rgba(0, 122, 255, 0.45);
+            --glass-purple: rgba(175, 82, 222, 0.5);
+            --glass-white: rgba(242, 242, 247, 0.3);
+            --glass-pink: rgba(235, 100, 180, 0.45); 
+            --glass-rock: rgba(142, 142, 147, 0.5);
+            --glass-ice: rgba(90, 200, 250, 0.5);
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro HK", "SF Pro TC", "PingFang HK", sans-serif; 
+            margin: 0; padding: 30px 10px;
+            background-image: url('bg.jpg'); 
+            background-size: cover; background-position: center; background-attachment: fixed;
+            min-height: 100vh; color: white; font-weight: bold;
+        }
+        
+        .main-header { 
+            max-width: 800px; width: 92%; margin: 10px auto 35px auto;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur);
+            padding: 30px; border: var(--ios-border); border-radius: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
+        }
+
+        h1 { margin: 0 0 15px 0; font-size: 1.8rem; font-weight: 900; letter-spacing: 3px; text-shadow: var(--text-shadow); }
+        
+        .progress-container {
+            width: 100%; max-width: 500px; 
+            background: rgba(0, 0, 0, 0.1); height: 14px; border-radius: 7px;
+            overflow: hidden; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.2);
+        }
+        .progress-bar {
+            height: 100%; background: linear-gradient(90deg, #ffffff, #b3e5fc);
+            width: 0%; transition: width 0.6s cubic-bezier(0.1, 0.7, 0.1, 1);
+        }
+        #stats-text { text-shadow: var(--text-shadow); }
+
+        /* 皮克敏容器與地影 */
+        .photo-wrapper {
+            position: absolute; right: -60px; bottom: -35px;
+            width: 240px; height: auto; z-index: 5; pointer-events: none;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .title-photo { width: 100%; height: auto; filter: none; }
+
+        .photo-wrapper::after {
+            content: ''; position: absolute; bottom: 5px; left: 10%; 
+            width: 40%; height: 15px; background: rgba(0, 0, 0, 0.2); 
+            border-radius: 50%; filter: blur(5px); z-index: -1;
+        }
+        
+        .top-controls {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 25px;
+        }
+
+        #search-input {
+            padding: 10px 18px; border-radius: 15px; border: var(--ios-border);
+            background: rgba(255,255,255,0.15); color: white; 
+            width: 180px; text-shadow: var(--text-shadow);
+        }
+        #search-input::placeholder { color: rgba(255,255,255,0.7); }
+
+        .btn {
+            padding: 10px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1); color: white; cursor: pointer; backdrop-filter: blur(10px);
+            font-weight: bold; transition: 0.3s; text-shadow: var(--text-shadow);
+        }
+        .btn.active { background: rgba(255,255,255,0.4); border-color: white; }
+
+        .color-header-sticky {
+            position: sticky; top: 0; z-index: 1000; margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            border-radius: 15px; border: var(--ios-border); overflow: hidden;
+        }
+
+        .color-table, .data-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 850px; table-layout: fixed; }
+        .color-header-sticky th { height: 55px; text-shadow: var(--text-shadow); }
+        .category-name-header { width: 170px; background: rgba(255,255,255,0.1) !important; padding-left: 20px; text-align: left; }
+
+        .table-container { 
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 20px; border: var(--ios-border); overflow: hidden;
+        }
+        
+        td { border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 14px 2px; text-align: center; text-shadow: var(--text-shadow); }
+
+        .category-name { 
+            text-align: left; background: rgba(255, 255, 255, 0.25) !important;
+            width: 170px; position: sticky; left: 0; z-index: 100; padding-left: 20px;
+        }
+
+        .th-red { background: var(--glass-red) !important; }
+        .th-yellow { background: var(--glass-yellow) !important; }
+        .th-blue { background: var(--glass-blue) !important; }
+        .th-purple { background: var(--glass-purple) !important; }
+        .th-white { background: var(--glass-white) !important; }
+        .th-pink { background: var(--glass-pink) !important; }
+        .th-rock { background: var(--glass-rock) !important; }
+        .th-ice { background: var(--glass-ice) !important; }
+
+        td.selected { background: rgba(255, 255, 255, 0.3) !important; box-shadow: inset 0 0 0 2px white; }
+
+        select {
+            width: 98%; border: none; background: transparent; color: white; font-size: 0.95rem; font-weight: bold;
+            appearance: none; -webkit-appearance: none; text-align: center; outline: none; text-shadow: var(--text-shadow);
+        }
+        select option { background: #333; color: white; }
+
+        .footer-controls {
+            margin-top: 40px; padding: 30px; border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
+        }
+        .btn-multi { border-color: #5ac8fa; color: #5ac8fa; }
+        .btn-multi.active { background: #5ac8fa; color: white; }
+        .btn-reset { border-color: #ff3b30; color: #ff3b30; font-size: 0.8rem; opacity: 0.8; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="main-header">
+        <h1>Pikmin皮克敏圖鑑</h1>
+        <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+        <div id="stats-text">讀取中...</div>
+        <div class="photo-wrapper">
+            <img src="pikmin-photo.jpg" alt="Pikmin" class="title-photo">
+        </div>
+    </div>
+
+    <div class="top-controls">
+        <input type="text" id="search-input" placeholder="搜尋系列..." onkeyup="search()">
+        <button class="btn active" onclick="filterData('all', this)">全部</button>
+        <button class="btn" onclick="filterData('花盆', this)">僅看花盆🪴</button>
+        <button class="btn" onclick="filterData('成長中', this)">僅看成長中🌱</button>
+        <button class="btn" onclick="filterData('已完成', this)">僅看已完成🌷</button>
+    </div>
+
+    <div class="data-region">
+        <div class="color-header-sticky">
+            <table class="color-table">
+                <thead>
+                    <tr>
+                        <th class="category-name-header">系列名稱</th>
+                        <th class="th-red">紅</th><th class="th-yellow">黃</th><th class="th-blue">藍</th>
+                        <th class="th-purple">紫</th><th class="th-white">白</th><th class="th-pink">粉</th>
+                        <th class="th-rock">岩</th><th class="th-ice">冰</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="table-container">
+            <table class="data-table"><tbody id="table-body"></tbody></table>
+        </div>
+    </div>
+
+    <div class="footer-controls">
+        <button id="multi-btn" class="btn btn-multi" onclick="toggleMultiMode()">多選批量模式：OFF</button>
+        <div id="multi-tools" class="top-controls hidden" style="margin-bottom: 0;">
+            <button class="btn" onclick="applyMultiStatus('未開始')">設為 -</button>
+            <button class="btn" onclick="applyMultiStatus('花盆')">設為 🪴</button>
+            <button class="btn" onclick="applyMultiStatus('成長中')">設為 🌱</button>
+            <button class="btn" onclick="applyMultiStatus('已完成')">設為 🌷</button>
+        </div>
+        <button class="btn btn-reset" onclick="clearAll()">重置所有數據</button>
+    </div>
+
+    <script>
+        const colors = ["紅", "黃", "藍", "紫", "白", "粉紅", "岩石", "冰"];
+        const categories = [
+            "餐廳", "咖啡廳", "甜點店 (馬卡龍)", "甜點店 (甜甜圈)", "電影院", "藥局", "動物園", 
+            "森林 (鍬形蟲)", "森林 (橡栗)", "水邊", "郵局", "美術館", "機場", 
+            "車站 (電車紙模型)", "車站 (票券)", "海灘", "漢堡店", "便利店 (瓶蓋)", 
+            "便利店 (零食)", "超市 (蘑菇)", "超市 (香蕉)", "麵包店", "美容院", "服裝店", 
+            "公園 (幸運草)", "公園 (四葉幸運草)", "圖書館", "路邊 (貼紙1)", "路邊 (貼紙2)", 
+            "路邊 (貼紙3)", "路邊 (金幣)", "壽司", "山丘", "體育館", "雨天", "下雪", 
+            "主題樂園", "公車站 (公車紙模型)", "義式餐廳 (pizza)", "義式餐廳 (意大利面)", 
+            "拉麵店", "橋樑", "飯店", "化妝品商店", "神社和寺廟", "電器行 (電池)", 
+            "電器行 (仙女燈)", "咖哩餐廳", "五金行", "大學&學院", "墨西哥餐廳", 
+            "自助 laundry", "韓國餐廳", "下午茶", "彩色粉末"
+        ];
+        
+        const tbody = document.getElementById('table-body');
+        let multiMode = false;
+        let selectedCells = [];
+
+        function render() {
+            tbody.innerHTML = '';
+            categories.forEach(cat => {
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-category', cat);
+                const nameTd = document.createElement('td');
+                nameTd.className = 'category-name';
+                nameTd.innerText = cat;
+                tr.appendChild(nameTd);
+
+                colors.forEach(color => {
+                    const td = document.createElement('td');
+                    const id = `${cat}-${color}`;
+                    const savedStatus = localStorage.getItem(id) || "未開始";
+                    td.setAttribute('data-id', id);
+                    td.setAttribute('data-status', savedStatus);
+                    td.onclick = function() {
+                        if(multiMode) {
+                            td.classList.toggle('selected');
+                            if(td.classList.contains('selected')) selectedCells.push(id);
+                            else selectedCells = selectedCells.filter(item => item !== id);
+                        }
+                    };
+                    const select = document.createElement('select');
+                    select.innerHTML = `<option value="未開始">-</option><option value="花盆">花盆🪴</option><option value="成長中">成長中🌱</option><option value="已完成">已完成🌷</option>`;
+                    select.value = savedStatus;
+                    select.onchange = (e) => {
+                        localStorage.setItem(id, e.target.value);
+                        td.setAttribute('data-status', e.target.value);
+                        updateStats();
+                    };
+                    select.style.pointerEvents = multiMode ? 'none' : 'auto';
+                    td.appendChild(select);
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            updateStats();
+        }
+
+        function toggleMultiMode() {
+            multiMode = !multiMode;
+            const btn = document.getElementById('multi-btn');
+            btn.innerText = multiMode ? "多選模式：ON (請點擊格子)" : "多選批量模式：OFF";
+            btn.classList.toggle('active', multiMode);
+            document.getElementById('multi-tools').classList.toggle('hidden', !multiMode);
+            if(!multiMode) {
+                selectedCells = [];
+                document.querySelectorAll('td.selected').forEach(td => td.classList.remove('selected'));
+            }
+            render();
+        }
+
+        function applyMultiStatus(status) {
+            if(selectedCells.length === 0) return alert("請先點擊選擇格子");
+            selectedCells.forEach(id => localStorage.setItem(id, status));
+            toggleMultiMode();
+        }
+
+        function search() {
+            const val = document.getElementById('search-input').value.toUpperCase();
+            document.querySelectorAll('tbody tr').forEach(tr => {
+                tr.classList.toggle('hidden', tr.getAttribute('data-category').toUpperCase().indexOf(val) === -1);
+            });
+        }
+
+        function filterData(status, btn) {
+            document.querySelectorAll('.top-controls .btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('tbody tr').forEach(tr => {
+                const tds = Array.from(tr.querySelectorAll('td')).slice(1);
+                const match = status === 'all' || tds.some(td => td.getAttribute('data-status') === status);
+                tr.classList.toggle('hidden', !match);
+            });
+        }
+
+        function updateStats() {
+            const finished = Object.values(localStorage).filter(v => v === "已完成").length;
+            const total = categories.length * colors.length;
+            const percent = Math.round((finished / total) * 100);
+            document.getElementById('progress-bar').style.width = percent + "%";
+            document.getElementById('stats-text').innerText = `已收集：${finished} / ${total} (${percent}%)`;
+        }
+
+        function clearAll() {
+            if(confirm("確定要重置所有數據嗎？")) {
+                localStorage.clear();
+                render();
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>
